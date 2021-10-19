@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { Request } from './entities/Request';
 import { Response } from './entities/Response';
-import { createConnection, getConnection } from 'typeorm';
+import { createConnection } from 'typeorm';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { config } from 'dotenv';
 
@@ -18,9 +19,19 @@ async function bootstrap() {
 		synchronize: true,
 		entities: [Request, Response],
 	});
-	getConnection();
 
+	const configOpenApi = new DocumentBuilder()
+		.setTitle('Mock-Request Documentación')
+		.setDescription(
+			'Docuemtación sobre los distintos endpoints de la herramienta',
+		)
+		.setVersion('1.0')
+		.addTag('mocks')
+		.build();
 	const app = await NestFactory.create(AppModule);
+	const document = SwaggerModule.createDocument(app, configOpenApi);
+	SwaggerModule.setup('api', app, document);
+
 	await app.listen(3000);
 }
 bootstrap();
