@@ -129,7 +129,7 @@ describe('DomainController.ts', () => {
 		);
 
 		// start
-		request(app.getHttpServer())
+		await request(app.getHttpServer())
 			.get(`/mock/${url}`)
 			.expect(HttpStatus.INTERNAL_SERVER_ERROR)
 			.expect('{"statusCode":500,"message":"Internal server error"}');
