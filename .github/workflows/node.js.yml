@@ -15,6 +15,6 @@ jobs:
         node-version: 14.18
     - run: npm ci
     - name: run unit test
-      run: npm run test:cov
+      run: npm run test
     - name: run e2e test
       run: npm run test:e2e
