@@ -2,8 +2,8 @@ version: '3.3'
 services:
   app:
     depends_on:
-      - db
-      - pgadmin
+      - 'db'
+      - 'pgadmin'
     image: nodejs
     build:
       context: .
@@ -11,7 +11,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: DEVELOP
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: mock_request
@@ -25,8 +24,6 @@ services:
       POSTGRES_PASSWORD: root
   pgadmin:
     image: dpage/pgadmin4
-    depends_on:
-      - db
     environment:
       PGADMIN_DEFAULT_EMAIL: root@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
