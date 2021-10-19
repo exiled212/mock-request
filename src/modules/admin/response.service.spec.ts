@@ -249,7 +249,7 @@ describe('ResponseService.ts', () => {
 		expect(response).toBeFalsy();
 	});
 
-	it('deleteResponse_deleteResponse_success', async () => {
+	it('deleteResponse_deleted_success', async () => {
 		// Given
 		const requestId = 1;
 		const req: RequestModel = new RequestModel();
@@ -297,5 +297,42 @@ describe('ResponseService.ts', () => {
 
 		// Validate
 		expect(response).toBeFalsy();
+	});
+
+	it('deleteRequest_delete_success', async () => {
+		// Given
+		const requestId = 1;
+		const req: RequestModel = new RequestModel();
+		req.id_md5 = '1';
+		req.url = 'test/bad-request';
+		req.method = 'GET';
+		req.headers = {};
+		req.queryParams = {};
+		req.body = '"{}"';
+
+		// Prepare
+		await getConnection().getRepository(RequestModel).save(req);
+
+		// Run
+		const message: string = await responseService.deleteRequest(requestId);
+		const list: RequestModel[] = await getConnection()
+			.getRepository(RequestModel)
+			.find();
+
+		// Validate
+		expect(message).toBeTruthy();
+		expect(message).toBe('Request 1 removed');
+		expect(list.length).toBe(0);
+	});
+
+	it('deleteRequest_requestNotFound_empty', async () => {
+		// Given
+		const requestId = 1;
+
+		// Run
+		const message: string = await responseService.deleteRequest(requestId);
+
+		// Validate
+		expect(message).toBeFalsy();
 	});
 });
