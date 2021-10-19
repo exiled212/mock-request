@@ -109,7 +109,7 @@ describe('DomainController.ts', () => {
 		// start
 		await request(app.getHttpServer())
 			.get(`/mock/${url}`)
-			.expect(HttpStatus.BAD_REQUEST)
+			.expect(HttpStatus.OK)
 			.expect('"{}"');
 
 		expect(requestFunc).toBeCalledTimes(1);
