@@ -36,7 +36,7 @@ $ docker-compose down
 
 ### **Acceder a la Base de datos de docker:**
 
-Si desea acceder directamente a la base de datos que se crea en docker, puede hacerlo desde pgAdmin4 con el siguiente link: http://localhost:5050/ con las siguientes credenciales:
+Si desea acceder directamente a la base de datos que se crea en docker, puede hacerlo desde pgAdmin4 con el siguiente link: http://localhost:5050/ con las siguientes credenciales de prueba:
 
 ***email:*** root@admin.com
 
