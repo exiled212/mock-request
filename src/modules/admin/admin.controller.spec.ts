@@ -186,7 +186,7 @@ describe('AdminController.ts', () => {
 			});
 	});
 
-	it('deleteResponse_deleted_NotFound', async () => {
+	it('deleteResponse_deleted_Ok', async () => {
 		// Given
 		const requestModel: RequestModel = new RequestModel();
 		requestModel.id_md5 = `md5_1`;
@@ -194,11 +194,6 @@ describe('AdminController.ts', () => {
 		requestModel.method = 'GET';
 		requestModel.queryParams = {};
 		requestModel.headers = {};
-		const body: ResponseData = {
-			content: {},
-			headers: {},
-			status: 200,
-		};
 
 		// Prepare
 		await getConnection().getRepository(RequestModel).save(requestModel);
@@ -206,7 +201,6 @@ describe('AdminController.ts', () => {
 		// start
 		await request(app.getHttpServer())
 			.delete(`/admin/remove-response/1`)
-			.send(body)
 			.expect(HttpStatus.OK)
 			.expect({
 				body: null,
@@ -223,6 +217,32 @@ describe('AdminController.ts', () => {
 		// start
 		await request(app.getHttpServer())
 			.delete(`/admin/remove-response/1`)
+			.expect(HttpStatus.NOT_FOUND)
+			.expect(`{"message":"Request id '1' not found"}`);
+	});
+
+	it('deleteRequest_deleted_Ok', async () => {
+		// Given
+		const requestModel: RequestModel = new RequestModel();
+		requestModel.id_md5 = `md5_1`;
+		requestModel.url = `some/test`;
+		requestModel.method = 'GET';
+		requestModel.queryParams = {};
+		requestModel.headers = {};
+
+		// Prepare
+		await getConnection().getRepository(RequestModel).save(requestModel);
+
+		// start
+		await request(app.getHttpServer())
+			.delete(`/admin/remove-request/1`)
+			.expect(HttpStatus.OK);
+	});
+
+	it('deleteRequest_requestIdNotFound_NotFound', async () => {
+		// start
+		await request(app.getHttpServer())
+			.delete(`/admin/remove-request/1`)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect(`{"message":"Request id '1' not found"}`);
 	});
