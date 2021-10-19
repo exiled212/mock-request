@@ -60,7 +60,8 @@
   "jest": {
     "modulePathIgnorePatterns": [
       "main.ts",
-      ".*\\.type\\.ts$"
+      ".*\\.type\\.ts$",
+	  ".*\\.module\\.ts$"
     ],
     "moduleFileExtensions": [
       "js",
