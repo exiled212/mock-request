@@ -1,6 +1,6 @@
 <p>
 	<a href="https://app.circleci.com/pipelines/github/exiled212/mock-request" target="_blank"><img src="https://circleci.com/gh/exiled212/mock-request/tree/master.svg?style=shield" alt="CircleCI" /></a>
-	<a href='https://coveralls.io/github/exiled212/mock-request?branch=master'><img src='https://coveralls.io/repos/github/exiled212/mock-request/badge.svg?branch=master' alt='Coverage Status' /></a>
+	<a href='https://coveralls.io/github/exiled212/mock-request?branch=master'><img src='https://coveralls.io/repos/github/exiled212/mock-request/badge.svg?branch=master' alt='Coverage Status' /></a> 
 </p>
 
 # Descripción
