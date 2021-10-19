@@ -16,9 +16,10 @@ Puede iniciar la aplicación de dos formas:
 
 ## Iniciar con docker-composer
 
-Solo tiene que corre el siguiente comando:
+Solo tiene que corre los siguientes comandos:
 
 ```bash
+$ docker-compose up -d db
 $ docker-compose up -d app
 ```
 
