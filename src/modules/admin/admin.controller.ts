@@ -8,6 +8,7 @@ import {
 	Body,
 	Put,
 	Delete,
+	Logger,
 } from '@nestjs/common';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
@@ -19,6 +20,8 @@ import { ResponseData } from './types/ResponseData.type';
 
 @Controller('/admin')
 export class AdminController {
+	private readonly logger = new Logger(AdminController.name);
+
 	constructor(
 		private readonly requestService: RequestService,
 		private readonly responseService: ResponseService,
@@ -29,6 +32,22 @@ export class AdminController {
 		try {
 			const requestList: RequestMode[] =
 				await this.requestService.getPendingRequest();
+			if (requestList.length > 0) {
+				return response.status(HttpStatus.OK).json(requestList);
+			} else {
+				return response.status(HttpStatus.NO_CONTENT).end();
+			}
+		} catch (error) {
+			return response
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.json(error);
+		}
+	}
+
+	@Get('/requests')
+	async getRequest(@Res() response: Response) {
+		try {
+			const requestList: any = await this.requestService.getRequest();
 			if (requestList.length > 0) {
 				return response.status(HttpStatus.OK).json(requestList);
 			} else {
@@ -71,18 +90,29 @@ export class AdminController {
 		@Param('requestId') requestId: number,
 		@Body() body: ResponseData,
 	) {
+		this.logger.log(
+			`[requestId: ${requestId}] insert response: ${JSON.stringify(
+				body,
+			)}`,
+		);
 		try {
 			const result: ResponseModel =
 				await this.responseService.createResponse(requestId, body);
+			this.logger.log(`[requestId: ${requestId}] Find response.`);
 			if (result) {
 				return response.status(HttpStatus.CREATED).json(result);
 			} else {
+				this.logger.warn(
+					`[requestId: ${requestId}] Response not found.`,
+				);
 				return response.status(HttpStatus.NOT_FOUND).json({
 					message: `Request id '${requestId}' not found`,
 				});
 			}
 		} catch (error) {
-			return response.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+			return response
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.json(error);
 		}
 	}
 

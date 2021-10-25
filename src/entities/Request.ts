@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	Unique,
+	OneToOne,
+} from 'typeorm';
+import { Response } from './Response';
 
 @Entity()
 @Unique('request_id_md5_ukey', ['id_md5'])
@@ -29,4 +36,7 @@ export class Request {
 		nullable: true,
 	})
 	body!: any;
+
+	@OneToOne(() => Response, (response) => response.request)
+	response!: Response;
 }

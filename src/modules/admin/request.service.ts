@@ -17,6 +17,16 @@ export class RequestService {
 			.createQueryBuilder('req')
 			.leftJoinAndSelect(ResponseModel, 'res', 'res.requestId = req.id')
 			.where('res.id is null')
+			.orderBy('req.id', 'ASC')
+			.getMany();
+	}
+
+	async getRequest() {
+		return await this.connection
+			.getRepository(RequestModel)
+			.createQueryBuilder('req')
+			.leftJoinAndSelect('req.response', 'response')
+			.orderBy('req.id', 'ASC')
 			.getMany();
 	}
 }

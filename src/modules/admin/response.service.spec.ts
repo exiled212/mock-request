@@ -226,6 +226,43 @@ describe('ResponseService.ts', () => {
 		expect(response.headers).toStrictEqual(responseData.headers);
 	});
 
+	it('createResponse_recreateResponse_success', async () => {
+		// Given
+		const requestId = 1;
+		const req: RequestModel = new RequestModel();
+		req.id_md5 = '1';
+		req.url = 'test/bad-request';
+		req.method = 'GET';
+		req.headers = {};
+		req.queryParams = {};
+		req.body = '"{}"';
+		const responseData: ResponseData = {
+			content: {
+				name: 'test',
+			},
+			headers: {
+				'content-type': 'application/json',
+			},
+			status: 200,
+		};
+
+		// Prepare
+		await getConnection().getRepository(RequestModel).save(req);
+
+		// Run
+		await responseService.createResponse(requestId, responseData);
+		const response: ResponseModel = await responseService.createResponse(
+			requestId,
+			responseData,
+		);
+
+		// Validate
+		expect(response).toBeTruthy();
+		expect(response.status).toBe(responseData.status);
+		expect(response.content).toStrictEqual(responseData.content);
+		expect(response.headers).toStrictEqual(responseData.headers);
+	});
+
 	it('createResponse_requestNotFound_empty', async () => {
 		// Given
 		const requestId = 1;
