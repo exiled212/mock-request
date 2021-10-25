@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
@@ -8,6 +8,8 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class DomainService {
+	private readonly logger = new Logger(DomainService.name);
+
 	private HEADERS_BLACKLIST = [
 		'Content-Length',
 		'Host',
@@ -28,8 +30,13 @@ export class DomainService {
 
 	async request(requestData: RequestData): Promise<ResponseModel> {
 		const idMd5: string = this.buildRequesSign(requestData);
+		this.logger.log(
+			`Build md5 ${idMd5} from RequestData ${JSON.stringify(
+				requestData,
+			)}`,
+		);
 		let response = null;
-		const request = await this.requestRepository.findOne({
+		let request = await this.requestRepository.findOne({
 			where: { id_md5: idMd5 },
 		});
 		if (request) {
@@ -37,11 +44,12 @@ export class DomainService {
 				request: request,
 			});
 		} else {
-			await this.requestRepository.save({
+			request = await this.requestRepository.save({
 				id_md5: idMd5,
 				...requestData,
 			});
 		}
+		this.logger.log(`[requestId: ${request.id}] Get request from ${idMd5}`);
 		return response;
 	}
 
@@ -58,6 +66,7 @@ export class DomainService {
 	}
 
 	private removeHeadersFromBlacklist(headers: any) {
+		this.logger.log(`Original headers: ${JSON.stringify(headers)}`);
 		const trueHeaders: any = {};
 		for (const index in headers) {
 			if (
@@ -68,6 +77,7 @@ export class DomainService {
 				trueHeaders[index] = headers[index];
 			}
 		}
+		this.logger.log(`Filter headers: ${JSON.stringify(trueHeaders)}`);
 		return trueHeaders;
 	}
 

@@ -92,6 +92,37 @@ describe('AdminController.ts', () => {
 			.expect({});
 	});
 
+	it('getRequest_withData_ok', async () => {
+		// Prepare
+		const requestModel: RequestModel = new RequestModel();
+		requestModel.id_md5 = `md5_1`;
+		requestModel.url = `/some/test`;
+		requestModel.method = 'GET';
+		requestModel.queryParams = {};
+		requestModel.headers = {};
+		const requestResponse: RequestModel = await getConnection()
+			.getRepository(RequestModel)
+			.save(requestModel);
+
+		const responseModel: ResponseModel = new ResponseModel();
+		responseModel.request = requestResponse;
+		responseModel.status = 200;
+		await getConnection().getRepository(ResponseModel).save(responseModel);
+
+		// start
+		await request(app.getHttpServer())
+			.get(`/admin/requests`)
+			.expect(HttpStatus.OK);
+	});
+
+	it('getRequest_withoutData_empty', async () => {
+		// start
+		await request(app.getHttpServer())
+			.get(`/admin/requests`)
+			.expect(HttpStatus.NO_CONTENT)
+			.expect({});
+	});
+
 	it('buildResponse_responseOk_created', async () => {
 		// Given
 		const requestModel: RequestModel = new RequestModel();

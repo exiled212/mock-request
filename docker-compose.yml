@@ -4,7 +4,6 @@ services:
     depends_on:
       - 'db'
       - 'pgadmin'
-    image: nodejs
     build:
       context: .
       dockerfile: Dockerfile
@@ -17,7 +16,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root
   db:
-    image: postgres:13
+    image: postgres:13-alpine
     environment:
       POSTGRES_DB: mock_request
       POSTGRES_USER: root

@@ -57,13 +57,25 @@ export class ResponseService {
 		const request: RequestModel = await this.requestRepository.findOne({
 			where: { id: requestId },
 		});
+
 		if (request) {
-			response = await this.responseRepository.save({
-				request: request,
-				status: responseData.status,
-				headers: responseData.headers,
-				content: responseData.content,
+			response = await this.responseRepository.findOne({
+				where: { request: request },
 			});
+
+			if (response) {
+				response.status = responseData.status;
+				response.headers = responseData.headers;
+				response.content = responseData.content;
+				response = await this.responseRepository.save(response);
+			} else {
+				response = await this.responseRepository.save({
+					request: request,
+					status: responseData.status,
+					headers: responseData.headers,
+					content: responseData.content,
+				});
+			}
 		}
 
 		return response;

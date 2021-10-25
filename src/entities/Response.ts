@@ -12,7 +12,7 @@ export class Response {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@OneToOne(() => Request, { nullable: false })
+	@OneToOne(() => Request, (request) => request.id, { nullable: false })
 	@JoinColumn()
 	request!: Request;
 
