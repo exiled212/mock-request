@@ -3,18 +3,23 @@ import axios, { AxiosResponse } from 'axios';
 import { getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { IgnoreConfig as IgnoreConfigModel } from '../../entities/IgnoreConfig';
 import { ResponseData } from './types/ResponseData.type';
+import { ConfigResponseBody } from './types/ConfigResponseBody.type';
 
 @Injectable()
 export class ResponseService {
 	connection: any;
 	requestRepository: any;
 	responseRepository: any;
+	ignoreConfigModel: any;
 
 	constructor() {
 		this.connection = getConnection();
 		this.requestRepository = this.connection.getRepository(RequestModel);
 		this.responseRepository = this.connection.getRepository(ResponseModel);
+		this.ignoreConfigModel =
+			this.connection.getRepository(IgnoreConfigModel);
 	}
 
 	async buildResponse(
@@ -79,6 +84,38 @@ export class ResponseService {
 		}
 
 		return response;
+	}
+
+	async configRequest(
+		requestId: number,
+		body: ConfigResponseBody,
+	): Promise<string> {
+		let result: string;
+		let ignoreConfig;
+		const request: RequestModel = await this.requestRepository.findOne({
+			where: { id: requestId },
+		});
+		if (request) {
+			ignoreConfig = await this.ignoreConfigModel.findOne({
+				where: { request: request },
+			});
+			if (ignoreConfig) {
+				ignoreConfig.headers = body.headers;
+				ignoreConfig.queryParams = body.queryParams;
+				ignoreConfig.body = body.body;
+				this.ignoreConfigModel.save(ignoreConfig);
+			} else {
+				this.ignoreConfigModel.save({
+					request: request,
+					headers: body.headers,
+					queryParams: body.queryParams,
+					body: body.body,
+				});
+			}
+			result = `Request ${requestId} config`;
+		}
+
+		return result;
 	}
 
 	async deleteRequest(requestId: number): Promise<string> {

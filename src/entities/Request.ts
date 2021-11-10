@@ -6,6 +6,7 @@ import {
 	OneToOne,
 } from 'typeorm';
 import { Response } from './Response';
+import { IgnoreConfig } from './IgnoreConfig';
 
 @Entity()
 @Unique('request_id_md5_ukey', ['id_md5'])
@@ -39,4 +40,7 @@ export class Request {
 
 	@OneToOne(() => Response, (response) => response.request)
 	response!: Response;
+
+	@OneToOne(() => IgnoreConfig, (ignoreConfig) => ignoreConfig.request)
+	ignoreConfig!: IgnoreConfig;
 }

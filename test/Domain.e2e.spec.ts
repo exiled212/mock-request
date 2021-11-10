@@ -6,6 +6,7 @@ import { createConnection, getConnection } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { Request as RequestModel } from '../src/entities/Request';
 import { Response as ResponseModel } from '../src/entities/Response';
+import { IgnoreConfig as IgnoreConfigModel } from '../src/entities/IgnoreConfig';
 import { rest } from 'msw';
 
 describe('DomainController E2E', () => {
@@ -27,7 +28,7 @@ describe('DomainController E2E', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, IgnoreConfigModel],
 			synchronize: true,
 			logging: false,
 		});

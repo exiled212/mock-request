@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { IgnoreConfig as IgnoreConfigModel } from '../../entities/IgnoreConfig';
 import { RequestData } from './types/RequestData.type';
 import * as crypto from 'crypto';
 
@@ -21,11 +22,14 @@ export class DomainService {
 	connection: any;
 	requestRepository: any;
 	responseRepository: any;
+	ignoreConfigModel: any;
 
 	constructor() {
 		this.connection = getConnection();
 		this.requestRepository = this.connection.getRepository(RequestModel);
 		this.responseRepository = this.connection.getRepository(ResponseModel);
+		this.ignoreConfigModel =
+			this.connection.getRepository(IgnoreConfigModel);
 	}
 
 	async request(requestData: RequestData): Promise<ResponseModel> {
@@ -88,7 +92,8 @@ export class DomainService {
 	buildRequesSign(requestData: RequestData): string {
 		const url: string = requestData.url;
 		const method: string = requestData.method;
-		const headers: string = JSON.stringify(requestData.headers);
+		// const headers: string = JSON.stringify(requestData.headers);
+		const headers = 'ignore';
 		const queryParams: string = JSON.stringify(requestData.queryParams);
 		const body: string = JSON.stringify(requestData.body);
 		const context = `url:${url}|method:${method}|headers:${headers}|queryParams:${queryParams}|body:${body}`;

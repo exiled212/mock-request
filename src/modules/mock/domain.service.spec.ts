@@ -4,6 +4,7 @@ import { DomainService } from './domain.service';
 import { RequestData } from './types/RequestData.type';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { IgnoreConfig as IgnoreConfigModel } from '../../entities/IgnoreConfig';
 
 describe('DomainService.ts', () => {
 	let domainService: DomainService;
@@ -13,7 +14,7 @@ describe('DomainService.ts', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, IgnoreConfigModel],
 			synchronize: true,
 			logging: false,
 		});
@@ -168,7 +169,7 @@ describe('DomainService.ts', () => {
 			method: 'GET',
 			queryParams: {},
 		};
-		const idMd5: string = domainService.buildRequesSign(requestData);
+		const idMd5: string = await domainService.buildRequesSign(requestData);
 
 		// start
 		await domainService.request(requestData);

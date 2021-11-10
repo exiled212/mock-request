@@ -17,6 +17,7 @@ import { RequestService } from './request.service';
 import { ResponseService } from './response.service';
 import { BuildResponseBody } from './types/BuildResponseBody.type';
 import { ResponseData } from './types/ResponseData.type';
+import { ConfigResponseBody } from './types/ConfigResponseBody.type';
 
 @Controller('/admin')
 export class AdminController {
@@ -52,6 +53,29 @@ export class AdminController {
 				return response.status(HttpStatus.OK).json(requestList);
 			} else {
 				return response.status(HttpStatus.NO_CONTENT).end();
+			}
+		} catch (error) {
+			return response
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.json(error);
+		}
+	}
+
+	@Put('/requests/config/:requestId')
+	async configRequest(
+		@Res() response: Response,
+		@Param('requestId') requestId: number,
+		@Body() body: ConfigResponseBody,
+	) {
+		try {
+			const message: any = await this.responseService.configRequest(
+				requestId,
+				body,
+			);
+			if (message) {
+				return response.status(HttpStatus.OK).json(message);
+			} else {
+				return response.status(HttpStatus.NOT_FOUND).end();
 			}
 		} catch (error) {
 			return response
