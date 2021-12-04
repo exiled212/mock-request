@@ -29,6 +29,7 @@ async function bootstrap() {
 		.addTag('mocks')
 		.build();
 	const app = await NestFactory.create(AppModule);
+	app.enableCors();
 	const document = SwaggerModule.createDocument(app, configOpenApi);
 	SwaggerModule.setup('api', app, document);
 
