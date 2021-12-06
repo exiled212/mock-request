@@ -27,7 +27,23 @@ export class AdminController {
 		private readonly responseService: ResponseService,
 	) {}
 
-	@Get('/pendings')
+	@Get('/request')
+	async getRequest(@Res() response: Response) {
+		try {
+			const requestList: any = await this.requestService.getRequest();
+			if (requestList.length > 0) {
+				return response.status(HttpStatus.OK).json(requestList);
+			} else {
+				return response.status(HttpStatus.NO_CONTENT).end();
+			}
+		} catch (error) {
+			return response
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.json(error);
+		}
+	}
+
+	@Get('/request/pending')
 	async getPendingsRequest(@Res() response: Response) {
 		try {
 			const requestList: RequestMode[] =
@@ -44,23 +60,7 @@ export class AdminController {
 		}
 	}
 
-	@Get('/requests')
-	async getRequest(@Res() response: Response) {
-		try {
-			const requestList: any = await this.requestService.getRequest();
-			if (requestList.length > 0) {
-				return response.status(HttpStatus.OK).json(requestList);
-			} else {
-				return response.status(HttpStatus.NO_CONTENT).end();
-			}
-		} catch (error) {
-			return response
-				.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.json(error);
-		}
-	}
-
-	@Post('/build-response/:requestId')
+	@Post('/request/:requestId')
 	async buildResponse(
 		@Res() response: Response,
 		@Param('requestId') requestId: number,
@@ -84,7 +84,7 @@ export class AdminController {
 		}
 	}
 
-	@Put('/insert-response/:requestId')
+	@Put('/request/:requestId')
 	async insertResponse(
 		@Res() response: Response,
 		@Param('requestId') requestId: number,
@@ -116,7 +116,7 @@ export class AdminController {
 		}
 	}
 
-	@Delete('remove-request/:requestId')
+	@Delete('request/:requestId')
 	async removeRequest(
 		@Res() response: Response,
 		@Param('requestId') requestId: number,
@@ -137,7 +137,7 @@ export class AdminController {
 		}
 	}
 
-	@Delete('remove-response/:requestId')
+	@Delete('response/:requestId')
 	async removeResponse(
 		@Res() response: Response,
 		@Param('requestId') requestId: number,

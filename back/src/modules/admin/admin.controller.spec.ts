@@ -14,6 +14,9 @@ import { ResponseData } from './types/ResponseData.type';
 
 describe('AdminController.ts', () => {
 	let app: INestApplication;
+	const REQUEST_PENDING_PATH = '/admin/request/pending';
+	const REQUEST_PATH = '/admin/request';
+	const RESPONSE_PATH = '/admin/response';
 
 	const server: SetupServerApi = setupServer(
 		rest.get('http://localhost/mockTest/some/test', (_, res, ctx) => {
@@ -63,7 +66,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(REQUEST_PENDING_PATH)
 			.expect(HttpStatus.OK)
 			.expect([{ ...requestModel }]);
 	});
@@ -87,7 +90,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(REQUEST_PENDING_PATH)
 			.expect(HttpStatus.NO_CONTENT)
 			.expect({});
 	});
@@ -111,14 +114,14 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.get(`/admin/requests`)
+			.get(REQUEST_PATH)
 			.expect(HttpStatus.OK);
 	});
 
 	it('getRequest_withoutData_empty', async () => {
 		// start
 		await request(app.getHttpServer())
-			.get(`/admin/requests`)
+			.get(REQUEST_PATH)
 			.expect(HttpStatus.NO_CONTENT)
 			.expect({});
 	});
@@ -140,7 +143,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.post(`/admin/build-response/1`)
+			.post(`${REQUEST_PATH}/1`)
 			.send(body)
 			.expect(HttpStatus.CREATED)
 			.expect(
@@ -156,7 +159,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.post(`/admin/build-response/1`)
+			.post(`${REQUEST_PATH}/1`)
 			.send(body)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect({ message: "Request id '1' not found" });
@@ -172,7 +175,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.put(`/admin/insert-response/1`)
+			.put(`${REQUEST_PATH}/1`)
 			.send(body)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect({ message: "Request id '1' not found" });
@@ -197,7 +200,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.put(`/admin/insert-response/1`)
+			.put(`${REQUEST_PATH}/1`)
 			.send(body)
 			.expect(HttpStatus.CREATED)
 			.expect({
@@ -231,7 +234,7 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-response/1`)
+			.delete(`${RESPONSE_PATH}/1`)
 			.expect(HttpStatus.OK)
 			.expect({
 				body: null,
@@ -247,7 +250,7 @@ describe('AdminController.ts', () => {
 	it('deleteResponse_requestIdNotFound_NotFound', async () => {
 		// start
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-response/1`)
+			.delete(`${RESPONSE_PATH}/1`)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect(`{"message":"Request id '1' not found"}`);
 	});
@@ -266,14 +269,14 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-request/1`)
+			.delete(`${REQUEST_PATH}/1`)
 			.expect(HttpStatus.OK);
 	});
 
 	it('deleteRequest_requestIdNotFound_NotFound', async () => {
 		// start
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-request/1`)
+			.delete(`${REQUEST_PATH}/1`)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect(`{"message":"Request id '1' not found"}`);
 	});
