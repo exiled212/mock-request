@@ -1,0 +1,11 @@
+{
+  "formControl": [
+    "block",
+    "w-full h-full",
+    "py-1 px-3",
+    "text-base",
+    "bg-white bg-clip-padding",
+    "border border-gray-300 border-solid rounded",
+    "focus:shadow-lg transition-shadow"
+  ]
+}

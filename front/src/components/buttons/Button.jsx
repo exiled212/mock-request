@@ -1,17 +1,21 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import btnClass from './btn_class.json';
 
 export const Button = ({typeStyle, actionBtn, ...props}) => {
   const btnType = (btnClass[typeStyle])?btnClass[typeStyle]:btnClass['primary'];
-  // eslint-disable-next-line react/prop-types
   const {children} = props;
   return (
     <React.Fragment>
       <button
         type="button"
-        // eslint-disable-next-line max-len
-        className= {`py-2 px-4 rounded-lg ${btnType} font-bold uppercase text-xs`}
+        className= {[
+          btnType,
+          'py-2 px-4',
+          'rounded-lg',
+          'font-bold uppercase text-xs',
+        ].join(' ')}
         onClick={(...args)=>{
           actionBtn(...args);
         }}
@@ -25,6 +29,7 @@ export const Button = ({typeStyle, actionBtn, ...props}) => {
 
 
 Button.propTypes = {
+  children: PropTypes.any,
   typeStyle: PropTypes.oneOf(Object.keys(btnClass)),
   actionBtn: PropTypes.func,
 };

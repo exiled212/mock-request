@@ -1,21 +1,28 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from 'react';
 import btnClass from './btn_class.json';
+import PropTypes from 'prop-types';
 
 export const GroupButton = ({...props})=> {
-  // eslint-disable-next-line react/prop-types
   const {children} = props;
-  // eslint-disable-next-line react/prop-types
   const lastIndex = children.length-1;
 
-  // eslint-disable-next-line react/prop-types
   const newChildren = children.map((child, index)=>{
     const border = buildBorder(index, lastIndex);
     const {typeStyle, actionBtn} = child.props;
     return React.cloneElement(child, {
       key: index,
       actionBtn: actionBtn,
-      // eslint-disable-next-line max-len
-      className: `${btnClass[typeStyle]} px-4 py-2 font-bold uppercase text-xs outline-none focus:outline-none mb-1 ease-linear transition-all duration-150 ease-linear transition-all mb-1 ${border}`,
+      className: [
+        btnClass[typeStyle],
+        border,
+        'px-4 py-2',
+        'font-bold uppercase text-xs',
+        'outline-none focus:outline-none',
+        'mb-1',
+        'ease-linear',
+        'transition-all duration-150 transition-all mb-1',
+      ].join(' '),
     });
   });
 
@@ -42,6 +49,10 @@ export const GroupButton = ({...props})=> {
     }
     return result;
   }
+};
+
+GroupButton.propTypes = {
+  children: PropTypes.any,
 };
 
 GroupButton.defaultProps = {

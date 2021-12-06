@@ -1,16 +1,19 @@
 import {Request} from '../../domain/Request';
 import {WebhookRepository} from '../Repositories/WebhookRepository';
+import {Utils} from '../Utils';
 /**
  * Implement WebhookRepository from request api
  */
 export class MookRequestImp implements WebhookRepository {
-  DOMAIN_URL: string;
+  PENDING_PATH: string;
+  REQUEST_PATH: string;
 
   /**
    * constructor
    */
   constructor() {
-    this.DOMAIN_URL = 'http://localhost:3001';
+    this.PENDING_PATH = Utils.getEnvs('PENDING_PATH');
+    this.REQUEST_PATH = Utils.getEnvs('REQUEST_PATH');
   }
 
   /**
@@ -19,7 +22,7 @@ export class MookRequestImp implements WebhookRepository {
    */
   async findPending(): Promise<Request[]> {
     let result: Request[] = [];
-    const res = await window.fetch(`${this.DOMAIN_URL}/admin/requests`);
+    const res = await window.fetch(this.PENDING_PATH);
     if (res.status === 200) {
       result = await res.json();
     }
@@ -34,7 +37,7 @@ export class MookRequestImp implements WebhookRepository {
   async deleteRequestByRequestId(requestId: number): Promise<boolean> {
     let result = false;
     const res = await window.fetch(
-        `${this.DOMAIN_URL}/admin/remove-request/${requestId}`,
+        `${this.REQUEST_PATH}/${requestId}`,
         {method: 'delete'},
     );
     if (res.status === 200) {

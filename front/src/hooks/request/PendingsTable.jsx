@@ -1,13 +1,22 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React, {useEffect} from 'react';
 import {Table} from '../../components/body/Table';
 import {RequestService} from '../services/RequestService';
 import {GroupButton} from '../../components/buttons/GroupButton';
 import {Button} from '../../components/buttons/Button';
+import {InputGroup} from '../../components/input/InputGroup';
+import {InputText} from '../../components/input/InputText';
 
 const requestService = new RequestService();
 
 export const PendingsTable = () => {
-  const [headers] = React.useState(['id', 'method', 'url', 'actions']);
+  const [headers] = React.useState([
+    'id',
+    'method',
+    'url',
+    'request',
+    'actions',
+  ]);
   const [rows, setRows] = React.useState([]);
 
   useEffect(getPendings, []);
@@ -24,11 +33,25 @@ export const PendingsTable = () => {
    * @return {*}
    */
   function addButtons(pending) {
+    const {domainUrl, setDomainUrl} = React.useState();
     return {
       ...pending,
+      request:
+        <InputGroup>
+          <Button
+            actionBtn={async ()=>{
+              console.log(domainUrl);
+            }}
+          >Send</Button>
+          <InputText
+            placeholder={'domain url'}
+            onChange={(evt)=>{
+              setDomainUrl(evt.target.value);
+            }}
+          />
+        </InputGroup>,
       actions:
       <GroupButton>
-        <Button>Request</Button>
         <Button typeStyle="success">Set</Button>
         <Button
           typeStyle="danger"

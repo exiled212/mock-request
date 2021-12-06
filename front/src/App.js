@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from 'react';
 import {PendingsTable} from './hooks/request/PendingsTable';
 import {AppNav} from './hooks/app/AppNav';
