@@ -12,11 +12,13 @@ import { BuildResponseBody } from './types/BuildResponseBody.type';
 import { rest } from 'msw';
 import { setupServer, SetupServerApi } from 'msw/node';
 import { ResponseData } from './types/ResponseData.type';
+import { MockConfigData } from './types/MockConfigData.type';
 
 describe('AdminController.ts', () => {
 	let app: INestApplication;
 	const REQUEST_PENDING_PATH = '/admin/request/pending';
 	const REQUEST_PATH = '/admin/request';
+	const CONFIG_PATH = '/admin/request/config';
 	const RESPONSE_PATH = '/admin/response';
 
 	const server: SetupServerApi = setupServer(
@@ -280,5 +282,55 @@ describe('AdminController.ts', () => {
 			.delete(`${REQUEST_PATH}/1`)
 			.expect(HttpStatus.NOT_FOUND)
 			.expect(`{"message":"Request id '1' not found"}`);
+	});
+
+	it('request_setConfig_success', async () => {
+		// Given
+		const configData: MockConfigData = {
+			url: '/test/url/1',
+			method: 'POST',
+			request_elements: ['headers', 'queryParams', 'body'],
+		};
+
+		// start
+		await request(app.getHttpServer())
+			.put(CONFIG_PATH)
+			.send(configData)
+			.expect(HttpStatus.CREATED);
+	});
+
+	it('request_deleteConfig_success', async () => {
+		// Given
+		const configData: MockConfigData = {
+			url: '/test/url/1',
+			method: 'POST',
+			request_elements: ['headers', 'queryParams', 'body'],
+		};
+
+		// start
+		await request(app.getHttpServer())
+			.put(CONFIG_PATH)
+			.send(configData)
+			.expect(HttpStatus.CREATED);
+
+		await request(app.getHttpServer())
+			.delete(`${CONFIG_PATH}/1`)
+			.send(configData)
+			.expect(HttpStatus.OK);
+	});
+
+	it('request_deleteConfig_success', async () => {
+		// Given
+		const configData: MockConfigData = {
+			url: '/test/url/1',
+			method: 'POST',
+			request_elements: ['headers', 'queryParams', 'body'],
+		};
+
+		// start
+		await request(app.getHttpServer())
+			.delete(`${CONFIG_PATH}/1`)
+			.send(configData)
+			.expect(HttpStatus.NOT_FOUND);
 	});
 });

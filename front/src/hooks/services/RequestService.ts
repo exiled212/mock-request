@@ -26,6 +26,19 @@ export class RequestService {
   }
 
   /**
+   * Set response data from reuqest
+   * @param {Request} pending
+   * @param {Response} response
+   */
+  async createResponse(
+      pending: Request,
+      response: Response,
+  ): Promise<boolean> {
+    return this.webhookRepository
+        .createResponseByRequestId(pending.id, response);
+  }
+
+  /**
    * Delete request
    * @param {Request} pending
    */

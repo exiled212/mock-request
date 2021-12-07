@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 
 export const Card = ({
   title,
   footer,
+  mainClass,
   titleProps,
   footerProps,
   ...props
@@ -20,6 +22,7 @@ export const Card = ({
           'border border-solid border-gray-300 box-border rounded',
           'min-w-0',
           'break-words',
+          ...mainClass,
         ].join(' ')}
         {...props}
       >
@@ -62,9 +65,11 @@ Card.propTypes = {
   titleProps: PropTypes.array,
   footer: PropTypes.any,
   footerProps: PropTypes.array,
+  mainClass: PropTypes.array,
 };
 
 Card.defaultProps = {
   titleProps: [],
   footerProps: [],
+  mainClass: [],
 };

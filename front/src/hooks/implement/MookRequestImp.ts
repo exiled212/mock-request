@@ -45,4 +45,26 @@ export class MookRequestImp implements WebhookRepository {
     }
     return Promise.resolve(result);
   }
+
+
+  /**
+   * create response
+   * @param {number} requestId
+   * @param {Response} response
+   * @return {promise}
+   */
+  async createResponseByRequestId(
+      requestId: number,
+      response: Response,
+  ): Promise<boolean> {
+    let result = false;
+    const res = await window.fetch(
+        `${this.REQUEST_PATH}/${requestId}`,
+        {method: 'put', body: JSON.stringify(response)},
+    );
+    if (res.status === 201) {
+      result = true;
+    }
+    return Promise.resolve(result);
+  }
 }

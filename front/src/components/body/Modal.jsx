@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import PropTypes from 'prop-types';
@@ -57,4 +58,8 @@ Modal.propTypes = {
   openModal: PropTypes.bool.isRequired,
   setOpenModal: PropTypes.any.isRequired,
   closedButtonRef: PropTypes.any.isRequired,
+};
+
+Modal.defaultProps = {
+  openModal: false,
 };

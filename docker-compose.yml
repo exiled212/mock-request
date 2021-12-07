@@ -1,0 +1,42 @@
+version: '3.3'
+services:
+  front:
+    build:
+      context: front/.
+      dockerfile: Dockerfile
+    depends_on:
+      - 'back'
+    environment:
+      REACT_APP_PENDING_PATH: http://localhost:3001/admin/request/pending
+      REACT_APP_REQUEST_PATH: http://localhost:3001/admin/request
+    ports:
+      - "3000:3000"
+  back:
+    depends_on:
+      - 'db'
+      - 'pgadmin'
+    build:
+      context: back/.
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: mock_request
+      DB_USER: root
+      DB_PASSWORD: root
+      PORT: 3001
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: mock_request
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"

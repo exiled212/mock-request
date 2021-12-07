@@ -4,7 +4,7 @@ import { MockController } from './mock.controller';
 import { DomainService } from './domain.service';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
-import { MockConfig as RequestConfigModel } from '../../entities/MockConfig';
+import { MockConfig as MockConfigModel } from '../../entities/MockConfig';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
@@ -17,7 +17,7 @@ describe('DomainController.ts', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel, RequestConfigModel],
+			entities: [RequestModel, ResponseModel, MockConfigModel],
 			synchronize: true,
 			logging: false,
 		});
