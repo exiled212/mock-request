@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Request } from './entities/Request';
 import { Response } from './entities/Response';
+import { MockConfig } from './entities/MockConfig';
 import { createConnection } from 'typeorm';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -17,7 +18,7 @@ async function bootstrap() {
 		username: process.env.DB_USER,
 		password: process.env.DB_PASSWORD,
 		synchronize: true,
-		entities: [Request, Response],
+		entities: [Request, Response, MockConfig],
 	});
 
 	const configOpenApi = new DocumentBuilder()

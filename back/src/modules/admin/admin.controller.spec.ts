@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createConnection, getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { MockConfig as MockConfigModel } from '../../entities/MockConfig';
 import { AdminController } from './admin.controller';
 import { RequestService } from './request.service';
 import { ResponseService } from './response.service';
@@ -32,7 +33,7 @@ describe('AdminController.ts', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, MockConfigModel],
 			synchronize: true,
 			logging: false,
 		});

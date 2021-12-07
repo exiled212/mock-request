@@ -3,7 +3,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { MockConfig as MockConfigModel } from '../../entities/MockConfig';
 import { RequestData } from './types/RequestData.type';
+import { MockConfigData } from './types/MockConfigData.type';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -21,15 +23,18 @@ export class DomainService {
 	connection: any;
 	requestRepository: any;
 	responseRepository: any;
+	mockConfigRepository: any;
 
 	constructor() {
 		this.connection = getConnection();
 		this.requestRepository = this.connection.getRepository(RequestModel);
 		this.responseRepository = this.connection.getRepository(ResponseModel);
+		this.mockConfigRepository =
+			this.connection.getRepository(MockConfigModel);
 	}
 
 	async request(requestData: RequestData): Promise<ResponseModel> {
-		const idMd5: string = this.buildRequesSign(requestData);
+		const idMd5: string = await this.buildRequesSign(requestData);
 		this.logger.log(
 			`Build md5 ${idMd5} from RequestData ${JSON.stringify(
 				requestData,
@@ -51,6 +56,42 @@ export class DomainService {
 		}
 		this.logger.log(`[requestId: ${request.id}] Get request from ${idMd5}`);
 		return response;
+	}
+
+	async createMockConfig(
+		requestData: RequestData,
+		mockConfigData: MockConfigData,
+	): Promise<MockConfigModel> {
+		let result: MockConfigModel;
+		const mockConfig = await this.mockConfigRepository.findOne({
+			where: { url: requestData.url, method: requestData.method },
+		});
+		if (!mockConfig) {
+			result = await this.mockConfigRepository.save({
+				url: requestData.url,
+				method: requestData.method,
+				elements: mockConfigData.request_elements,
+			});
+		} else {
+			mockConfig.elements = mockConfigData.request_elements;
+			result = await this.mockConfigRepository.save(mockConfig);
+		}
+
+		return result;
+	}
+
+	async deleteMockConfig(id: number): Promise<boolean> {
+		let result = false;
+		const mockConfig = await this.mockConfigRepository.findOne({
+			where: { id },
+		});
+		if (mockConfig) {
+			const deletedResult = await this.mockConfigRepository.delete({
+				id: mockConfig.id,
+			});
+			result = deletedResult ? true : false;
+		}
+		return result;
 	}
 
 	getRequestDataFromRequest(request: Request): RequestData {
@@ -85,13 +126,24 @@ export class DomainService {
 		return params[0];
 	}
 
-	buildRequesSign(requestData: RequestData): string {
-		const url: string = requestData.url;
-		const method: string = requestData.method;
-		const headers: string = JSON.stringify(requestData.headers);
-		const queryParams: string = JSON.stringify(requestData.queryParams);
-		const body: string = JSON.stringify(requestData.body);
-		const context = `url:${url}|method:${method}|headers:${headers}|queryParams:${queryParams}|body:${body}`;
+	async buildRequesSign(requestData: RequestData): Promise<string> {
+		const config: MockConfigModel = await this.mockConfigRepository.findOne(
+			{
+				where: { url: requestData.url, method: requestData.method },
+			},
+		);
+		let context = '';
+		let elements = ['url', 'method', 'headers', 'queryParams', 'body'];
+
+		if (config) {
+			elements = ['url', 'method', ...config.elements];
+		}
+
+		context = elements
+			.sort((a, b) => a.localeCompare(b))
+			.map((e) => `${e}:${JSON.stringify(requestData[e])}`)
+			.join('|');
+
 		return crypto.createHash('md5').update(context).digest('hex');
 	}
 }

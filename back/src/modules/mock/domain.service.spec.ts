@@ -4,6 +4,8 @@ import { DomainService } from './domain.service';
 import { RequestData } from './types/RequestData.type';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { MockConfig as MockConfigModel } from '../../entities/MockConfig';
+import { MockConfigData } from './types/MockConfigData.type';
 
 describe('DomainService.ts', () => {
 	let domainService: DomainService;
@@ -13,7 +15,7 @@ describe('DomainService.ts', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, MockConfigModel],
 			synchronize: true,
 			logging: false,
 		});
@@ -29,7 +31,7 @@ describe('DomainService.ts', () => {
 		return conn.close();
 	});
 
-	it('buildRequesSign_basic_md5', () => {
+	it('buildRequesSign_basic_md5', async () => {
 		// Given
 		const requestData: RequestData = {
 			url: '/test/url',
@@ -40,14 +42,14 @@ describe('DomainService.ts', () => {
 		};
 
 		// start
-		const result: string = domainService.buildRequesSign(requestData);
+		const result: string = await domainService.buildRequesSign(requestData);
 
 		// Validate
-		expect(result).toBe('fcf3e6ca4034095905601ee5c0f84ecc');
+		expect(result).toBe('82f8075a2ffc04305a4ec19f280ec3f8');
 		return;
 	});
 
-	it('buildRequesSign_withHeaders_md5', () => {
+	it('buildRequesSign_withHeaders_md5', async () => {
 		// Given
 		const requestData: RequestData = {
 			url: '/test/url',
@@ -63,14 +65,14 @@ describe('DomainService.ts', () => {
 		};
 
 		// start
-		const result: string = domainService.buildRequesSign(requestData);
+		const result: string = await domainService.buildRequesSign(requestData);
 
 		// Validate
-		expect(result).toBe('bef4498ad0c4c3e4c9b81edc64155833');
+		expect(result).toBe('072e4263796fc1784b0985b2c7bbab07');
 		return;
 	});
 
-	it('buildRequesSign_withHeadersDiferentOrder_md5', () => {
+	it('buildRequesSign_withHeadersDiferentOrder_md5', async () => {
 		// Given
 		const requestData: RequestData = {
 			url: '/test/url',
@@ -86,10 +88,10 @@ describe('DomainService.ts', () => {
 		};
 
 		// start
-		const result: string = domainService.buildRequesSign(requestData);
+		const result: string = await domainService.buildRequesSign(requestData);
 
 		// Validate
-		expect(result).toBe('bef4498ad0c4c3e4c9b81edc64155833');
+		expect(result).toBe('072e4263796fc1784b0985b2c7bbab07');
 		return;
 	});
 
@@ -139,7 +141,7 @@ describe('DomainService.ts', () => {
 			method: 'GET',
 			queryParams: {},
 		};
-		const idMd5: string = domainService.buildRequesSign(requestData);
+		const idMd5: string = await domainService.buildRequesSign(requestData);
 
 		// start
 		await domainService.request(requestData);
@@ -168,7 +170,7 @@ describe('DomainService.ts', () => {
 			method: 'GET',
 			queryParams: {},
 		};
-		const idMd5: string = domainService.buildRequesSign(requestData);
+		const idMd5: string = await domainService.buildRequesSign(requestData);
 
 		// start
 		await domainService.request(requestData);
@@ -249,6 +251,118 @@ describe('DomainService.ts', () => {
 		// Validate
 		expect(responseAll.length).toBe(3);
 		expect(count).toBe(3);
+
+		return;
+	});
+
+	it('mockConfig_setConfig_save', async () => {
+		// Given
+		const repo = getConnection().getRepository(MockConfigModel);
+		const requestData: RequestData = {
+			url: '/test/url/1',
+			body: {},
+			headers: {
+				'4': 'd',
+			},
+			method: 'POST',
+			queryParams: {},
+		};
+		const configData: MockConfigData = {
+			request_elements: ['headers', 'queryParams', 'body'],
+		};
+
+		// start
+		await domainService.createMockConfig(requestData, configData);
+		const responseAll: MockConfigModel[] = await repo.find();
+		const count = await repo.count();
+
+		// Validate
+		expect(responseAll.length).toBe(1);
+		expect(count).toBe(1);
+
+		return;
+	});
+
+	it('mockConfig_removeConfig_deleted', async () => {
+		// Given
+		const repo = getConnection().getRepository(MockConfigModel);
+		const requestData: RequestData = {
+			url: '/test/url/1',
+			body: {},
+			headers: {
+				'4': 'd',
+			},
+			method: 'POST',
+			queryParams: {},
+		};
+		const configData: MockConfigData = {
+			request_elements: ['headers', 'queryParams', 'body'],
+		};
+
+		// start
+		const mockConfig: MockConfigModel =
+			await domainService.createMockConfig(requestData, configData);
+		const responseAll1: MockConfigModel[] = await repo.find();
+		const count1 = await repo.count();
+
+		// Validate
+		expect(responseAll1.length).toBe(1);
+		expect(count1).toBe(1);
+
+		// start
+		const deleted: boolean = await domainService.deleteMockConfig(
+			mockConfig.id,
+		);
+		const responseAll2: MockConfigModel[] = await repo.find();
+		const count2 = await repo.count();
+
+		// Validate
+		expect(deleted).toBe(true);
+		expect(responseAll2.length).toBe(0);
+		expect(count2).toBe(0);
+
+		return;
+	});
+
+	it('request_WithConfig_saveOne', async () => {
+		// Given
+		const repo = getConnection().getRepository(RequestModel);
+		const requestData: RequestData = {
+			url: '/test/url/1',
+			body: {},
+			headers: {
+				'3': 'c',
+				'2': 'b',
+				'1': 'a',
+				'4': 'd',
+			},
+			method: 'POST',
+			queryParams: {},
+		};
+		const requestData1: RequestData = {
+			url: '/test/url/1',
+			body: {},
+			headers: {
+				'3': 'c',
+				'4': 'd',
+			},
+			method: 'POST',
+			queryParams: {},
+		};
+		const configData: MockConfigData = {
+			request_elements: [],
+		};
+
+		// start
+		await domainService.createMockConfig(requestData, configData);
+		await domainService.request(requestData);
+		await domainService.request(requestData1);
+		const responseAll: RequestModel[] = await repo.find();
+		const count = await repo.count();
+
+		// Validate
+		expect(responseAll.length).toBe(1);
+		expect(count).toBe(1);
 
 		return;
 	});

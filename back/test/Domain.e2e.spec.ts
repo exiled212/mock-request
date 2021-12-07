@@ -6,6 +6,7 @@ import { createConnection, getConnection } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { Request as RequestModel } from '../src/entities/Request';
 import { Response as ResponseModel } from '../src/entities/Response';
+import { MockConfig as RequestConfigModel } from '../src/entities/MockConfig';
 import { rest } from 'msw';
 
 describe('DomainController E2E', () => {
@@ -27,7 +28,7 @@ describe('DomainController E2E', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, RequestConfigModel],
 			synchronize: true,
 			logging: false,
 		});
@@ -52,7 +53,7 @@ describe('DomainController E2E', () => {
 
 		// Get Request
 		const pendings = await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(`/admin/request/pending`)
 			.expect(HttpStatus.OK)
 			.send();
 
@@ -60,7 +61,7 @@ describe('DomainController E2E', () => {
 
 		// Create Response
 		await request(app.getHttpServer())
-			.post(`/admin/build-response/${requestList[0].id}`)
+			.post(`/admin/request/${requestList[0].id}`)
 			.send({
 				domain,
 			})
@@ -82,7 +83,7 @@ describe('DomainController E2E', () => {
 
 		// Get Request
 		const pendings = await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(`/admin/request/pending`)
 			.expect(HttpStatus.OK)
 			.send();
 
@@ -90,7 +91,7 @@ describe('DomainController E2E', () => {
 
 		// Create Response
 		await request(app.getHttpServer())
-			.put(`/admin/insert-response/${requestList[0].id}`)
+			.put(`/admin/request/${requestList[0].id}`)
 			.send({
 				content: { name: 'test 2' },
 				headers: {},
@@ -114,7 +115,7 @@ describe('DomainController E2E', () => {
 
 		// Get Request
 		const pendings = await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(`/admin/request/pending`)
 			.expect(HttpStatus.OK)
 			.send();
 
@@ -122,7 +123,7 @@ describe('DomainController E2E', () => {
 
 		// Create Response
 		await request(app.getHttpServer())
-			.put(`/admin/insert-response/${requestList[0].id}`)
+			.put(`/admin/request/${requestList[0].id}`)
 			.send({
 				content: { name: 'test 2' },
 				headers: {},
@@ -131,7 +132,7 @@ describe('DomainController E2E', () => {
 			.expect(HttpStatus.CREATED);
 
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-response/${requestList[0].id}`)
+			.delete(`/admin/response/${requestList[0].id}`)
 			.expect(HttpStatus.OK);
 
 		await request(app.getHttpServer())
@@ -139,11 +140,11 @@ describe('DomainController E2E', () => {
 			.expect(HttpStatus.NOT_FOUND);
 
 		await request(app.getHttpServer())
-			.delete(`/admin/remove-request/${requestList[0].id}`)
+			.delete(`/admin/request/${requestList[0].id}`)
 			.expect(HttpStatus.OK);
 
 		await request(app.getHttpServer())
-			.get(`/admin/pendings`)
+			.get(`/admin/request/pending`)
 			.expect(HttpStatus.NO_CONTENT)
 			.send();
 

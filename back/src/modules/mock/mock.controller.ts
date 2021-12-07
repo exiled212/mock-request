@@ -50,4 +50,11 @@ export class MockController {
 			}
 		}
 	}
+
+	@All('/config/*')
+	async config(@Req() request: Request, @Res() response: Response) {
+		const requestData: RequestData =
+			this.domainService.getRequestDataFromRequest(request);
+		response.status(201).end();
+	}
 }

@@ -2,6 +2,7 @@ import { createConnection, getConnection } from 'typeorm';
 import { RequestService } from './request.service';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
+import { MockConfig as RequestConfigModel } from '../../entities/MockConfig';
 import { Test, TestingModule } from '@nestjs/testing';
 
 describe('RequestService.ts', () => {
@@ -12,7 +13,7 @@ describe('RequestService.ts', () => {
 			type: 'sqlite',
 			database: ':memory:',
 			dropSchema: true,
-			entities: [RequestModel, ResponseModel],
+			entities: [RequestModel, ResponseModel, RequestConfigModel],
 			synchronize: true,
 			logging: false,
 		});
