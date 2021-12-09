@@ -15,6 +15,8 @@ export class MockController {
 		let code: number = HttpStatus.NOT_FOUND;
 		let headers: any = null;
 		let body: any = null;
+		let responseTime: number;
+		let limitTimeout: number;
 		try {
 			const requestData: RequestData =
 				this.domainService.getRequestDataFromRequest(request);
@@ -32,6 +34,8 @@ export class MockController {
 				code = responseData.status;
 				headers = responseData.headers;
 				body = responseData.content;
+				responseTime = responseData.responseTime;
+				limitTimeout = responseData.limitTimeout;
 			}
 		} catch (error) {
 			this.logger.error(`Mock Error: ${JSON.stringify(error)}`);
@@ -42,6 +46,8 @@ export class MockController {
 				`Mock response: [${JSON.stringify({ code, headers, body })}]`,
 			);
 			const result = response.status(code).set(headers);
+			request.setTimeout(limitTimeout | 90);
+			await this.sleep(responseTime | 1);
 
 			if (body) {
 				return result.json(body);
@@ -50,4 +56,6 @@ export class MockController {
 			}
 		}
 	}
+
+	private sleep = (m: number) => new Promise((r) => setTimeout(r, m));
 }

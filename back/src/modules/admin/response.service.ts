@@ -4,9 +4,12 @@ import { getConnection } from 'typeorm';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
 import { ResponseData } from './types/ResponseData.type';
+import { performance } from 'perf_hooks';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class ResponseService {
+	private readonly logger = new Logger(ResponseService.name);
 	connection: any;
 	requestRepository: any;
 	responseRepository: any;
@@ -26,7 +29,9 @@ export class ResponseService {
 			where: { id: requestId },
 		});
 		if (request) {
+			const initResponseTime: number = performance.now();
 			const resultCall: AxiosResponse = await this.call(request, domain);
+			const responseTime: number = performance.now() - initResponseTime;
 			const response: ResponseModel =
 				await this.responseRepository.findOne({
 					where: { request: request },
@@ -35,6 +40,8 @@ export class ResponseService {
 				response.status = resultCall.status;
 				response.headers = resultCall.headers;
 				response.content = resultCall.data as any;
+				response.responseTime = responseTime;
+				response.limitTimeout = 90000;
 				result = await this.responseRepository.save(response);
 			} else {
 				result = await this.responseRepository.save({
@@ -42,6 +49,8 @@ export class ResponseService {
 					status: resultCall.status,
 					headers: resultCall.headers,
 					content: resultCall.data,
+					responseTime: responseTime,
+					limitTimeout: 90000,
 				});
 			}
 		}
@@ -52,6 +61,8 @@ export class ResponseService {
 	async createResponse(
 		requestId: number,
 		responseData: ResponseData,
+		responseTime = 1,
+		limitTimeout = 90,
 	): Promise<ResponseModel> {
 		let response: ResponseModel;
 		const request: RequestModel = await this.requestRepository.findOne({
@@ -67,6 +78,8 @@ export class ResponseService {
 				response.status = responseData.status;
 				response.headers = responseData.headers;
 				response.content = responseData.content;
+				response.responseTime = responseTime;
+				response.limitTimeout = limitTimeout;
 				response = await this.responseRepository.save(response);
 			} else {
 				response = await this.responseRepository.save({
@@ -74,6 +87,8 @@ export class ResponseService {
 					status: responseData.status,
 					headers: responseData.headers,
 					content: responseData.content,
+					responseTime: responseTime,
+					limitTimeout: limitTimeout,
 				});
 			}
 		}
@@ -92,6 +107,11 @@ export class ResponseService {
 		}
 
 		return result;
+	}
+
+	async deletePendings(): Promise<string> {
+		await this.requestRepository.delete({ response: null });
+		return 'Pendings removed';
 	}
 
 	async deleteResponse(requestId: number): Promise<RequestModel> {

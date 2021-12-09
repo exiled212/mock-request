@@ -146,12 +146,9 @@ describe('AdminController.ts', () => {
 
 		// start
 		await request(app.getHttpServer())
-			.post(`${REQUEST_PATH}/1`)
+			.post(`${REQUEST_PATH}/1?limitTimeout=10`)
 			.send(body)
-			.expect(HttpStatus.CREATED)
-			.expect(
-				'{"request":{"id":1,"id_md5":"md5_1","url":"some/test","method":"GET","headers":{},"queryParams":{},"body":null},"status":200,"headers":{"x-powered-by":"msw","content-type":"application/json"},"content":{"name":"test"},"id":1}',
-			);
+			.expect(HttpStatus.CREATED);
 	});
 
 	it('buildResponse_requestIdNotFound_NotFound', async () => {
@@ -219,6 +216,8 @@ describe('AdminController.ts', () => {
 				status: 200,
 				headers: {},
 				content: {},
+				responseTime: 1,
+				limitTimeout: 90,
 				id: 1,
 			});
 	});

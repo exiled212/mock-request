@@ -262,6 +262,8 @@ describe('ResponseService.ts', () => {
 		expect(response.status).toBe(responseData.status);
 		expect(response.content).toStrictEqual(responseData.content);
 		expect(response.headers).toStrictEqual(responseData.headers);
+		expect(response.limitTimeout).toStrictEqual(90);
+		expect(response.responseTime).toStrictEqual(1);
 	});
 
 	it('createResponse_requestNotFound_empty', async () => {

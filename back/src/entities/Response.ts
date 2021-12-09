@@ -26,4 +26,10 @@ export class Response {
 		nullable: true,
 	})
 	content!: any;
+
+	@Column({ nullable: true })
+	responseTime!: number;
+
+	@Column({ nullable: true })
+	limitTimeout!: number;
 }

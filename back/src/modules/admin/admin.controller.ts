@@ -9,6 +9,7 @@ import {
 	Put,
 	Delete,
 	Logger,
+	Query,
 } from '@nestjs/common';
 import { Request as RequestModel } from '../../entities/Request';
 import { Response as ResponseModel } from '../../entities/Response';
@@ -54,6 +55,18 @@ export class AdminController {
 			} else {
 				return response.status(HttpStatus.NO_CONTENT).end();
 			}
+		} catch (error) {
+			return response
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.json(error);
+		}
+	}
+
+	@Delete('/request/pending')
+	async deletePendingsRequest(@Res() response: Response) {
+		try {
+			await this.responseService.deletePendings();
+			return response.status(HttpStatus.OK).end();
 		} catch (error) {
 			return response
 				.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -118,15 +131,17 @@ export class AdminController {
 		@Res() response: Response,
 		@Param('requestId') requestId: number,
 		@Body() body: ResponseData,
+		@Query('responseTime') responseTime: number,
+		@Query('limitTimeout') limitTimeout: number,
 	) {
-		this.logger.log(
-			`[requestId: ${requestId}] insert response: ${JSON.stringify(
-				body,
-			)}`,
-		);
 		try {
 			const result: ResponseModel =
-				await this.responseService.createResponse(requestId, body);
+				await this.responseService.createResponse(
+					requestId,
+					body,
+					responseTime,
+					limitTimeout,
+				);
 			this.logger.log(`[requestId: ${requestId}] Find response.`);
 			if (result) {
 				return response.status(HttpStatus.CREATED).json(result);
