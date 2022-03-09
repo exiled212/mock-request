@@ -69,6 +69,8 @@ describe('DomainController.ts', () => {
 			'Content-Type': 'application/json',
 		};
 		responseModel.request = new RequestModel();
+		responseModel.responseTime = 1;
+		responseModel.limitTimeout = 90000;
 
 		// When
 		const requestFunc = jest.spyOn(domainService, 'request');
@@ -98,6 +100,8 @@ describe('DomainController.ts', () => {
 			'Content-Type': 'application/json',
 		};
 		responseModel.request = new RequestModel();
+		responseModel.responseTime = 1;
+		responseModel.limitTimeout = 90000;
 
 		// When
 		const requestFunc = jest.spyOn(domainService, 'request');
@@ -119,13 +123,12 @@ describe('DomainController.ts', () => {
 	it('request_singlerGet_internalError', async () => {
 		// Given
 		const url = 'some/url/test';
-		const responseModel = new ResponseModel();
 
 		// When
 		const requestFunc = jest.spyOn(domainService, 'request');
 		requestFunc.mockReturnValue(
 			new Promise((res) => {
-				res(responseModel);
+				res([] as any);
 			}),
 		);
 

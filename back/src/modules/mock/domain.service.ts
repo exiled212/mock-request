@@ -34,11 +34,6 @@ export class DomainService {
 
 	async request(requestData: RequestData): Promise<ResponseModel> {
 		const idMd5: string = await this.buildRequesSign(requestData);
-		this.logger.log(
-			`Build md5 ${idMd5} from RequestData ${JSON.stringify(
-				requestData,
-			)}`,
-		);
 		let response = null;
 		let request = await this.requestRepository.findOne({
 			where: { id_md5: idMd5 },
@@ -53,7 +48,6 @@ export class DomainService {
 				...requestData,
 			});
 		}
-		this.logger.log(`[requestId: ${request.id}] Get request from ${idMd5}`);
 		return response;
 	}
 
@@ -70,7 +64,6 @@ export class DomainService {
 	}
 
 	private removeHeadersFromBlacklist(headers: any) {
-		this.logger.log(`Original headers: ${JSON.stringify(headers)}`);
 		const trueHeaders: any = {};
 		for (const index in headers) {
 			if (
@@ -81,7 +74,6 @@ export class DomainService {
 				trueHeaders[index] = headers[index];
 			}
 		}
-		this.logger.log(`Filter headers: ${JSON.stringify(trueHeaders)}`);
 		return trueHeaders;
 	}
 

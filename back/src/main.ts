@@ -6,6 +6,7 @@ import { createConnection } from 'typeorm';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { config } from 'dotenv';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
 	config();
@@ -30,6 +31,8 @@ async function bootstrap() {
 		.addTag('mocks')
 		.build();
 	const app = await NestFactory.create(AppModule);
+	app.use(bodyParser.json({ limit: '5000mb' }));
+	app.use(bodyParser.urlencoded({ limit: '5000mb', extended: true }));
 	app.enableCors();
 	const document = SwaggerModule.createDocument(app, configOpenApi);
 	SwaggerModule.setup('api', app, document);

@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "request-as-curl": "^0.1.0"
+  }
+}

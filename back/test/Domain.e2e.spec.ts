@@ -140,7 +140,8 @@ describe('DomainController E2E', () => {
 			.expect(HttpStatus.NOT_FOUND);
 
 		await request(app.getHttpServer())
-			.delete(`/admin/request/${requestList[0].id}`)
+			.delete(`/admin/request`)
+			.send(requestList.map((r) => r.id))
 			.expect(HttpStatus.OK);
 
 		await request(app.getHttpServer())

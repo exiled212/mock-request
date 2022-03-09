@@ -1,5 +1,18 @@
 version: '3.3'
 services:
+  local:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_NAME: mock_request
+      DB_USER: daniel
+      DB_PASSWORD: daniel
+    network_mode: "host"
   app:
     depends_on:
       - 'db'

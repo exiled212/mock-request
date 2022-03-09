@@ -4,32 +4,24 @@ import { Request, Response } from 'express';
 import { Response as ResponseModel } from '../../entities/Response';
 import { RequestData } from './types/RequestData.type';
 
-@Controller('/mock')
+@Controller()
 export class MockController {
 	private readonly logger = new Logger(MockController.name);
 
 	constructor(private readonly domainService: DomainService) {}
 
-	@All('/*')
+	@All('/mock/*')
 	async request(@Req() request: Request, @Res() response: Response) {
 		let code: number = HttpStatus.NOT_FOUND;
 		let headers: any = null;
 		let body: any = null;
-		let responseTime: number;
-		let limitTimeout: number;
+		let responseTime = 1;
+		let limitTimeout = 90000;
+		const requestData: RequestData =
+			this.domainService.getRequestDataFromRequest(request);
 		try {
-			const requestData: RequestData =
-				this.domainService.getRequestDataFromRequest(request);
-			this.logger.log(
-				`Get RequestData from Request: ${JSON.stringify(requestData)}`,
-			);
 			const responseData: ResponseModel =
 				await this.domainService.request(requestData);
-			this.logger.log(
-				`Get ResponseModel from RequestData: ${JSON.stringify(
-					responseData,
-				)}`,
-			);
 			if (responseData) {
 				code = responseData.status;
 				headers = responseData.headers;
@@ -38,16 +30,15 @@ export class MockController {
 				limitTimeout = responseData.limitTimeout;
 			}
 		} catch (error) {
-			this.logger.error(`Mock Error: ${JSON.stringify(error)}`);
 			code = HttpStatus.INTERNAL_SERVER_ERROR;
 			body = `System error: ${error}`;
 		} finally {
 			this.logger.log(
-				`Mock response: [${JSON.stringify({ code, headers, body })}]`,
+				`Request: [method: ${requestData.method} url: ${requestData.url} code: ${code} responseTime: ${responseTime}ms limitTimeout: ${limitTimeout}ms]`,
 			);
 			const result = response.status(code).set(headers);
-			request.setTimeout(limitTimeout | 90);
-			await this.sleep(responseTime | 1);
+			request.setTimeout(limitTimeout);
+			await this.sleep(responseTime);
 
 			if (body) {
 				return result.json(body);
